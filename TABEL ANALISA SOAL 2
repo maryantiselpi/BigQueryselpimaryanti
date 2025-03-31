@@ -1,0 +1,32 @@
+select 
+	kft.transaction_id as id_transaksi,
+	kft.date as tgl_transaksi,
+	kft.branch_id as id_cabang,
+	kkc.branch_name as nama_cabang,
+	kkc.kota as kota_cabang,
+	kkc.provinsi as provinsi_cabang,
+	kkc.rating as rating_cabang,
+	kft.customer_name as nama_customer,
+	kp.product_id as id_product,
+	kp.product_name as nama_produk,
+	kp.price as harga_obat,
+	kft.discount_percentage as diskon, 
+	(case 
+		when kp.price <= 50000 then 0.10
+		when kp.price > 50000 and kp.price <= 100000 then 0.15
+		when kp.price > 100000 and kp.price <= 300000 then 0.20
+		when kp.price > 300000 and kp.price <= 500000 then 0.25
+		else 0.30
+	end) as persentase_laba,
+	(kft.price - (kft.price * kft.discount_percentage )) as net_sales,
+	kft.price * (case 
+		when kp.price <= 50000 then 0.10
+		when kp.price > 50000 and kp.price <= 100000 then 0.15
+		when kp.price > 100000 and kp.price <= 300000 then 0.20
+		when kp.price > 300000 and kp.price <= 500000 then 0.25
+		else 0.30
+	end) as nett_profit,
+	kft.rating as rating_transaksi
+from kf_final_transaction as kft
+left join kf_kantor_cabang as kkc on kkc.branch_id = kft.branch_id
+left join kf_product as kp on kp.product_id = kft.product_id
